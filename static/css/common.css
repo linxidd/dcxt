@@ -1,11 +1,12 @@
 @charset "utf-8";
-body{background: #f2f2f2;}
+body{background: #fff;}
 .clear {clear: both;}
 ul {display: block;}
+h1 {text-align: center;}
 
 .main {width: 100%;min-width: 1100px;}
 .header {width: 100%; background: #fff;}
-.header_center {width: 1000px; margin: 0 auto; padding-top: 30px; height: 130px; background: #fff;}
+.header_center {width: 450px; margin: 0 auto; padding-top: 30px; height: 130px; background: #fff;}
 .nav {background: #1369c0; height: 37px;width: 100%;}
 .nav_home{width: 1100px;margin:0 auto;}
 #menu{width:1000px;height: 37px;margin:0 auto}
@@ -14,8 +15,13 @@ ul {display: block;}
 .nav_home li{float: left;font-family: "FZYouHK_512B","微软雅黑","宋体";font-size: 20px;line-height: 37px;border-right: 1px solid #bfbfbf;display: block;}
 .nav_home li a {display: block;color: #fff;padding: 0 24px;}
 
-.content {width: 1100px;background: #fff;}
-
+.content {width: 1100px;margin: 0 auto;}
+#login {width:600px;height: 250px;background: #fff;margin:50px auto;position:relative;}
+form {display: block;margin-top:0em;}
+#login form p {text-align:center;}
+#username{background: url(../img/user.png) rgba(0,0,0,.1) no-repeat;width: 200px;height: 30px;border: solid #ccc 1px;border-radius: 3px;padding-left: 32px;margin-top:50px;margin-bottom: 30px;}
+#password{background: url(../img/user.png) rgba(0,0,0,.1) no-repeat;width: 200px;height: 30px;border: solid #ccc 1px;border-radius: 3px;padding-left: 32px;margin-bottom: 30px;}
+#submit{width: 232px;height: 30px;background: rgba(0,0,0,.1);border: solid #ccc 1px;border-radius: 3px;}
 .footer{width: 1100px;height: 90px; background: #1369c0; margin: 0 auto;}
 .footer-content{width: 1000px; margin: 0 auto;text-align: center;}
 .footer-content span {font-size: 10px; color: #fff;}
