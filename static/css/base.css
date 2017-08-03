@@ -1,0 +1,4 @@
+@charset "utf-8";
+body > div {margin-right: auto;margin-left: auto;}
+body,div,ul,ol,ul,li,ol,dl,dd,dt,form,span,p,textarea {margin: 0;padding: 0;list-style:none;}
+a{ontline-style:none;text-decoration: none;}

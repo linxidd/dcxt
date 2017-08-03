@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>临西县地方税务局网上订餐系统</title>
+  <link rel="stylesheet" type="text/css" href="../static/css/base.css">
+  <link rel="stylesheet" type="text/css" href="../static/css/common.css">
+  <script type="text/javascript" charset="utf-8" src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+  {% block header %}
+  {% endblock %}
+</head>
+<body>
+<!-- 网页主体结构开始　-->
+  <div class="main">
+<!-- 网页banner开始 -->
+    <div class="header">
+      <div class="header_center">
+        <div class="header_left">
+          <a href="/" target="_blank">
+            <img src="../static/img/banner.png" alt="">
+          </a>
+        </div>
+      </div>
+<!-- 网页banner结束　-->
+    </div>
+    <div class="content">
+      {% block content %}
+      {% endblock %}
+    </div>
+<!-- 网页主体结构结束　-->
+    <div class="footer">
+      <div class="footer-content">
+        <br>
+        <span>临西县地方税务局主办</span> <br>
+        <span>版权所有　临西县地方税务局</span> <br>
+        <span>地址：河北省邢台市临西县珠江路　邮编：054900</span>
+      </div>
+    </div>
+  </div>
+  {% block js %}
+  {% endblock %}
+</body>
+</html>
