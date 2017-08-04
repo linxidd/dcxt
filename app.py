@@ -1,26 +1,30 @@
 # -*- coding:utf-8 -*-
+import os
 from flask import Flask, render_template, redirect, request, url_for
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import Required
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager, login_required
+from flask_login import LoginManager, login_required, UserMixin
 
+basedir = os.path.abspath(os.path.dirname(__file__))
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir,'database.db')
 app.config['SECRET_KEY'] = 'hard to guess'
+app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.session_protection = 'strong'
 login_manager.login_view = 'login'
 
 
-class User(db.Model):
+class User(UserMixin, db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String, unique=True)
     password_hash = db.Column(db.String(128))
+    orders = db.relationship('Order', backref='user')
 
     def __init__(self, username, password_hash):
         self.username = username
@@ -42,9 +46,11 @@ class User(db.Model):
 
 
 class Order(db.Model):
+    __tablename__ = 'orders'
     id = db.Column(db.Integer, primary_key=True)
     order_date = db.Column(db.Date)
     orered = db.Column(db.Integer)
+    order_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
 
 class LoginForm(FlaskForm):
@@ -66,7 +72,7 @@ def login():
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
         if user is not None and user.verify_password(form.password.data):
-            return redirect(url_for('main'))
+            return render_template('order.html')
     return render_template('login.html', form=form)
 
 
