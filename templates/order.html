@@ -1,5 +1,23 @@
 {% extends "layout.html"%}
 
 {% block content %}
+<div class="left">
+{% if current_user.is_authenticated %}
+  {{ xm }}
+{% endif %}
+</div>
+<div class="right">
+<form id="bld" action="/add_order" method="post">
+<input id='breakfirst' type="button" value="早餐">
+<input id='lunch' type="button" value="午餐">
+<input id='dinner' type="button" value="晚餐">
+</from>
+</div>
+<script type="text/javascript">
+  $(function(){
+    $('#breakfirst').click(function(){
 
+    })
+  })
+</script>
 {% endblock %}

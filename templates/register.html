@@ -1,0 +1,25 @@
+{% extends "layout.html"%}
+
+{% block content %}
+<div id="login">
+  <h1>注册</h1>
+  <form action="/register" method="POST">
+    {{ form.csrf_token }}
+    <p>
+    {{ form.username(size=20) }}
+    </p>
+    <p>
+    {{ form.xm(size=20) }}
+    </p>
+    <p>
+    {{ form.password(size=20) }}
+    </p>
+    <p>
+    {{ form.password1(size=20) }}
+    </p>
+    <p>
+    {{ form.submit()}}
+    </p>
+  </form>
+</div>
+{% endblock %}
