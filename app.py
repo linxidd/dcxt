@@ -1,7 +1,8 @@
 # -*- coding:utf-8 -*-
 import os
 import datetime
-from flask import Flask, render_template, redirect, request, url_for, g, flash, jsonify
+import json
+from flask import Flask, render_template, redirect, request, url_for, g, flash, jsonify, Markup
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import Required, EqualTo
@@ -51,6 +52,13 @@ class Order(db.Model):
     order_date = db.Column(db.Date)
     ordered = db.Column(db.String)
     order_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+
+class Article(db.Model):
+    __tablename__ = 'article'
+    id = db.Column(db.Integer, primary_key=True)
+    recipe_date = db.Column(db.Date)
+    recipe_content = db.Column(db.String)
 
 
 class LoginForm(FlaskForm):
@@ -185,6 +193,42 @@ def jiuburangnicai():
     else:
         order_exist_br = Order.query.filter(Order.ordered==u'早餐',Order.order_date==date+datetime.timedelta(days=1)).all()
         return render_template('admin.html',ordered_br=len(order_exist_br),ordered_lc=len(order_exist_lc),ordered_dn=len(order_exist_dn),riqi=(date+datetime.timedelta(days=1)).strftime('%Y-%m-%d'),riqi1=date.strftime('%Y-%m-%d'),br_username=order_exist_br,ln_username=order_exist_lc,dn_username=order_exist_dn)
+
+
+@app.route('/editor')
+def editor():
+    return render_template('ueditor.html')
+
+
+@app.route('/upload/', methods=['GET', 'POST'])
+def upload():
+    result = {}
+    action = request.args.get('action')
+    with open(os.path.join(os.getcwd(), 'static', 'ueditor', 'php',
+                           'config.json')) as fp:
+        try:
+            CONFIG = json.loads(re.sub(r'\/\*.*\*\/', '', fp.read()))
+        except:
+            CONFIG = {}
+    if action == 'config':
+        result = json.dumps(CONFIG)
+        return result
+    else:
+        date = datetime.date.today()
+        article = Article(recipe_date=date,recipe_content=request.form['editorValue'])
+        db.session.add(article)
+        db.session.commit()
+        return render_template('article.html',
+                               article_content=Markup(
+                                   request.form['editorValue']))
+
+
+@app.route('/recipe/')
+def recipe():
+    article_content = Article.query.order_by(Article.recipe_date.desc()).first()
+    return render_template('article.html',
+                               article_content=Markup(
+                                   article_content.recipe_content))
 
 if __name__ == '__main__':
     app.run(debug=True)

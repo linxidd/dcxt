@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+{% block header %}
+{{ super() }}
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<script src="{{ url_for('static', filename='ueditor/ueditor.parse.js')}}"></script>
+{% endblock %}
+{% block menu %}
+{% include "menu.html" %}
+{% endblock %}
+{% block content %}
+  <div class="padd">
+<!-- 位置条开始 -->
+<!-- 文章数据开始　-->
+    <div class="article oneColumn pub_border">
+      <h1>每周食谱</h1>
+      <div class="pages_content" id="UEDITOR_CONTENT">
+        {{ article_content }}
+        <script type="text/javascript">
+       uParse(#UEDITOR_CONTENT)
+        </script>
+<!-- 文章内容结束　-->
+      </div>
+<!-- 文章数据结束　-->
+    </div>
+  </div>
+{% endblock %}

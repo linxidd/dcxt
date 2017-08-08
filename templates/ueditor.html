@@ -1,0 +1,20 @@
+{% extends "layout.html" %}
+{% block header %}
+{{ super() }}
+<script type="text/javascript" charset="utf-8" src="{{ url_for('static', filename='ueditor/ueditor.config.js') }}"></script>
+<script type="text/javascript" charset="utf-8" src="{{ url_for('static', filename='ueditor/ueditor.all.min.js') }}"> </script>
+<script type="text/javascript" charset="utf-8" src="{{ url_for('static', filename='ueditor/lang/zh-cn/zh-cn.js') }}"></script>
+{% endblock %}
+{% block content %}
+<div class="editor_wrapper">
+<h1>食谱编辑</h1>
+  <form id="form" method="post" action="/upload/">
+    <script id="editor" type="text/plain" style="width:1100px;height:500px;"></script>
+    <script type="text/javascript">
+      var ue=UE.getEditor('editor',{
+                          serverUrl:"/upload/"});
+    </script>
+    <input type="submit" value="提交">
+  </form>
+</div>
+{% endblock %}
