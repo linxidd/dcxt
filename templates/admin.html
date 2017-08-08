@@ -1,0 +1,28 @@
+{% extends "layout.html"%}
+
+{% block content %}
+<h1>订餐量查询</h1>
+<div id="search">
+<div id="br">
+<h3>早餐</h3>{{ riqi }}
+<p>{{ ordered_br }}人</p>
+{% for br in br_username %}
+{{ br.user.xm }}
+{% endfor %}
+</div>
+<div id="lc">
+<h3>午餐</h3>{{ riqi1 }}
+<p>{{ ordered_lc }}人</p>
+{% for ln in ln_username %}
+{{ ln.user.xm }}
+{% endfor %}
+</div>
+<div id="dn">
+<h3>晚餐</h3>{{ riqi1 }}
+<p>{{ ordered_dn }}人</p>
+{% for dn in br_username %}
+{{ dn.user.xm }}
+{% endfor %}
+</div>
+</div>
+{% endblock %}

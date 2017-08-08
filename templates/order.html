@@ -1,23 +1,91 @@
 {% extends "layout.html"%}
 
 {% block content %}
+<h1>网上订餐系统</h1>
 <div class="left">
 {% if current_user.is_authenticated %}
-  {{ xm }}
+<p>
+用户名：{{ xm }}
 {% endif %}
+<a href="/logout">登出</a>
+</p>
+<p>
+  本日订餐：
+</p>
+<p class="can">{{ breakfirst }}</p>
+<p class="can">{{ lunch }}</p>
+<p class="can">{{ dinner }}</p>
 </div>
 <div class="right">
 <form id="bld" action="/add_order" method="post">
-<input id='breakfirst' type="button" value="早餐">
-<input id='lunch' type="button" value="午餐">
-<input id='dinner' type="button" value="晚餐">
+<input id='breakfirst' type="button" value="早餐(前日17点前)">
+<input id='lunch' type="button" value="午餐(当日10点前)">
+<input id='dinner' type="button" value="晚餐(当日16点前)">
 </from>
+</div>
+<div>
+<span>注意：1、早餐订餐为第二天早餐，本日订餐显示的已定早餐为第二日早餐 2、请严格按照时间订餐，超过订餐时间按钮将不可用 3、请不要多次订餐，系统将不记录除第一次以外的订餐</span>
 </div>
 <script type="text/javascript">
   $(function(){
     $('#breakfirst').click(function(){
-
+        $.ajax({
+               type:'POST',
+               url:'/add_order',
+               data:{'ordered':'早餐','username':'{{ current_user.username}}' },
+               success:function(data){
+                if (data.ok==true){
+                alert("订餐成功！");}
+                else {
+                  alert("您已订餐或重试!")
+                }
+               }
+             })
     })
+    $('#lunch').click(function(){
+        $.ajax({
+               type:'POST',
+               url:'/add_order',
+               data:{'ordered':'午餐','username':'{{ current_user.username}}' },
+               success:function(data){
+                if (data.ok==true){
+                alert("订餐成功！");}
+                else {
+                  alert("您已订餐或重试!")
+                }
+               }
+             })
+    })
+    $('#dinner').click(function(){
+        $.ajax({
+               type:'POST',
+               url:'/add_order',
+               data:{'ordered':'晚餐','username':'{{ current_user.username}}' },
+               success:function(data){
+                if (data.ok==true){
+                alert("订餐成功！");}
+                else {
+                  alert("您已订餐或重试!")
+                }
+               }
+             })
+    })
+
+    var d = new Date();
+    var hour_now = d.getHours();
+    switch(true){
+      case (hour_now>10 && hour_now<16):
+      $("#lunch").attr("disabled",true);
+      $("#lunch").css({"background":"#ccc","border": "3px solid #ccc"});
+      case (hour_now>=16):
+      $("#lunch").attr("disabled",true);
+      $("#lunch").css({"background":"#ccc","border": "3px solid #ccc"});
+      $("#dinner").attr("disabled",true);
+      $("#dinner").css({"background":"#ccc","border": "3px solid #ccc"});
+      case (hour_now>17 && hour_now<9):
+      $("#breakfirst").attr("disabled",true);
+      $("#lunch").css({"background":"#ccc","border": "3px solid #ccc"});
+    }
   })
 </script>
 {% endblock %}

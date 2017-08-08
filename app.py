@@ -1,12 +1,13 @@
 # -*- coding:utf-8 -*-
 import os
-from flask import Flask, render_template, redirect, request, url_for, g, flash
+import datetime
+from flask import Flask, render_template, redirect, request, url_for, g, flash, jsonify
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import Required, EqualTo
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager, login_required, UserMixin, login_user
+from flask_login import LoginManager, login_required, UserMixin, login_user, logout_user
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 app = Flask(__name__)
@@ -48,7 +49,7 @@ class Order(db.Model):
     __tablename__ = 'orders'
     id = db.Column(db.Integer, primary_key=True)
     order_date = db.Column(db.Date)
-    orered = db.Column(db.Integer)
+    ordered = db.Column(db.String)
     order_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
 
@@ -61,10 +62,10 @@ class LoginForm(FlaskForm):
 
 
 class RegistrationForm(FlaskForm):
-    username = StringField(u'用户名',validators=[Required()])
-    xm = StringField(u'姓名',validators=[Required()])
-    password = PasswordField(u'密码',validators=[Required(),EqualTo(u'password1',message='密码不一致')])
-    password1 = PasswordField(u'确认密码',validators=[Required()])
+    username = StringField(u'用户名',validators=[Required()],render_kw={'placeholder': u'用户名'})
+    xm = StringField(u'姓名',validators=[Required()],render_kw={'placeholder': u'姓名'})
+    password = PasswordField(u'密码',validators=[Required(),EqualTo(u'password1',message='密码不一致')],render_kw={'placeholder': u'密码'})
+    password1 = PasswordField(u'确认密码',validators=[Required()],render_kw={'placeholder': u'重复密码'})
     submit = SubmitField(u'注册')
 
 
@@ -88,13 +89,70 @@ def login():
 @login_required
 def order(username):
     user = User.query.filter_by(username=username).first()
-    return render_template('order.html',xm=user.xm)
-
+    order_exist_br = Order.query.filter(Order.user==user,Order.ordered==u'早餐',Order.order_date==datetime.date.today()+datetime.timedelta(days=1)).first()
+    order_exist_lc = Order.query.filter(Order.user==user,Order.ordered==u'午餐',Order.order_date==datetime.date.today()).first()
+    order_exist_dn = Order.query.filter(Order.user==user,Order.ordered==u'晚餐',Order.order_date==datetime.date.today()).first()
+    if order_exist_br:
+        breakfirst = order_exist_br.ordered
+    else:
+        breakfirst = ''
+    if order_exist_lc:
+        lunch = order_exist_lc.ordered
+    else:
+        lunch = ''
+    if order_exist_dn:
+        dinner = order_exist_dn.ordered
+    else:
+        dinner = ''
+    return render_template('order.html',xm=user.xm,breakfirst=breakfirst,lunch=lunch,dinner=dinner)
 
 @app.route('/add_order', methods=['GET','POST'])
 @login_required
 def add_order():
-    pass
+    ordered = request.form.get('ordered','')
+    date = datetime.date.today()
+    time = datetime.datetime.now()
+    username = request.form.get('username','')
+    user = User.query.filter_by(username=username).first()
+    if ordered == u'早餐':
+        date = date + datetime.timedelta(days=1)
+    order_exist = Order.query.filter(Order.order_date==date,Order.ordered==ordered,Order.user==user).first()
+    if order_exist:
+        return jsonify(ok=False)
+    else:
+        if ordered == u'早餐':
+            if time.hour<17:
+                order = Order(order_date=date,
+                      ordered = ordered,
+                      user = user
+                      )
+                db.session.add(order)
+            else:
+                return jsonify(ok=False)
+        elif ordered == u'午餐':
+            if time.hour<9:
+                order = Order(order_date=date,
+                      ordered = ordered,
+                      user = user
+                      )
+                db.session.add(order)
+            else:
+                return jsonify(ok=False)
+        else:
+            if time.hour<15:
+                order = Order(order_date=date,
+                      ordered = ordered,
+                      user = user
+                      )
+                db.session.add(order)
+            else:
+                return jsonify(ok=False)
+    try:
+        db.session.commit()
+        return jsonify(ok=True)
+    except:
+        return jsonify(ok=False)
+
 
 @app.route('/register', methods=['GET','POST'])
 def register():
@@ -107,6 +165,26 @@ def register():
         flash('注册成功')
         return redirect(url_for('register'))
     return render_template('register.html',form=form)
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return  redirect(url_for('login'))
+
+
+@app.route('/nimencaibudao')
+def jiuburangnicai():
+    date = datetime.date.today()
+    time = datetime.datetime.now()
+    order_exist_lc = Order.query.filter(Order.ordered==u'午餐',Order.order_date==date).all()
+    order_exist_dn = Order.query.filter(Order.ordered==u'晚餐',Order.order_date==date).all()
+    if time.hour<8:
+        order_exist_br = Order.query.filter(Order.ordered==u'早餐',Order.order_date==date).all()
+        return render_template('admin.html',ordered_br=len(order_exist_br),ordered_lc=len(order_exist_lc),ordered_dn=len(order_exist_dn),riqi=date.strftime('%Y-%m-%d'),riqi1=date.strftime('%Y-%m-%d'),br_username=order_exist_br,ln_username=order_exist_lc,dn_username=order_exist_dn)
+    else:
+        order_exist_br = Order.query.filter(Order.ordered==u'早餐',Order.order_date==date+datetime.timedelta(days=1)).all()
+        return render_template('admin.html',ordered_br=len(order_exist_br),ordered_lc=len(order_exist_lc),ordered_dn=len(order_exist_dn),riqi=(date+datetime.timedelta(days=1)).strftime('%Y-%m-%d'),riqi1=date.strftime('%Y-%m-%d'),br_username=order_exist_br,ln_username=order_exist_lc,dn_username=order_exist_dn)
 
 if __name__ == '__main__':
     app.run(debug=True)
